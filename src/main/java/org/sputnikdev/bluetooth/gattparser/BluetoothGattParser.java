@@ -25,9 +25,12 @@ import org.slf4j.LoggerFactory;
 import org.sputnikdev.bluetooth.gattparser.spec.BluetoothGattSpecificationReader;
 import org.sputnikdev.bluetooth.gattparser.spec.Characteristic;
 import org.sputnikdev.bluetooth.gattparser.spec.Field;
+import org.sputnikdev.bluetooth.gattparser.spec.FieldFormat;
 import org.sputnikdev.bluetooth.gattparser.spec.Service;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -208,7 +211,20 @@ public class BluetoothGattParser {
      * @return a list of field specifications for a given characteristic
      */
     public List<Field> getFields(String characteristicUUID) {
-        return specificationReader.getFields(getCharacteristic(getShortUUID(characteristicUUID)));
+        Characteristic characteristic = getCharacteristic(getShortUUID(characteristicUUID));
+        List<Field> fields = new ArrayList(specificationReader.getFields(characteristic));
+
+        try {
+            if (characteristic.getValue().getPrettyPrint() != null) {
+                String fieldName = "PrettyPrint " + characteristic.getName();
+                Field field = new Field(fieldName, "utf8s");
+                fields.add(field);
+            }
+        } catch (NullPointerException e) {
+            logger.error("Error pretty-printing {}", characteristic.getName());
+        }
+
+        return Collections.unmodifiableList(fields);
     }
 
     /**

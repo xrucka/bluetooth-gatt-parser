@@ -33,7 +33,6 @@ import java.util.List;
  */
 @XStreamAlias("Field")
 public class Field {
-
     @XStreamAsAttribute
     private String name;
     @XStreamAlias("InformativeText")
@@ -68,6 +67,11 @@ public class Field {
     private boolean unknown;
     @XStreamAsAttribute
     private boolean system;
+
+    public Field(String name, String format) {
+        this.name = name;
+        this.format = format;
+    }
 
     public String getName() {
         return name != null ? name.trim() : null;

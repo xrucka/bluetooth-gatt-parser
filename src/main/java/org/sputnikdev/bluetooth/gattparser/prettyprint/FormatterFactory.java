@@ -1,10 +1,11 @@
-package org.sputnikdev.bluetooth.gattparser.spec;
+package org.sputnikdev.bluetooth.gattparser.prettyprint;
 
 /*-
  * #%L
  * org.sputnikdev:bluetooth-gatt-parser
  * %%
  * Copyright (C) 2017 Sputnik Dev
+ * Copyright (C) 2018 Lukas Rucka
  * %%
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,30 +21,13 @@ package org.sputnikdev.bluetooth.gattparser.spec;
  * #L%
  */
 
-import com.thoughtworks.xstream.annotations.XStreamAlias;
-import com.thoughtworks.xstream.annotations.XStreamImplicit;
-
-import java.util.Collections;
-import java.util.List;
+import org.sputnikdev.bluetooth.gattparser.CharacteristicFormatException;
+import org.sputnikdev.bluetooth.gattparser.spec.Characteristic;
 
 /**
- *
- * @author Vlad Kolotov
+ * FormatterFactory interface
+ * @author Lukas Rucka
  */
-@XStreamAlias("Value")
-public class Value {
-    @XStreamAlias("PrettyPrint")
-    private String prettyPrint;
-
-    @XStreamImplicit
-    private List<Field> fields;
-
-    public String getPrettyPrint() {
-        return prettyPrint;
-    }
-
-    public List<Field> getFields() {
-        return Collections.unmodifiableList(fields);
-    }
-
+public interface FormatterFactory {
+    public Formatter prettyPrint(Characteristic characteristic) throws CharacteristicFormatException ;
 }

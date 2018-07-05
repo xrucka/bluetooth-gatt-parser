@@ -24,6 +24,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sputnikdev.bluetooth.gattparser.num.FloatingPointNumberFormatter;
 import org.sputnikdev.bluetooth.gattparser.num.RealNumberFormatter;
+import org.sputnikdev.bluetooth.gattparser.prettyprint.BasicFormatterFactory;
+import org.sputnikdev.bluetooth.gattparser.prettyprint.Formatter;
+import org.sputnikdev.bluetooth.gattparser.prettyprint.FormatterFactory;
 import org.sputnikdev.bluetooth.gattparser.spec.BluetoothGattSpecificationReader;
 import org.sputnikdev.bluetooth.gattparser.spec.Characteristic;
 import org.sputnikdev.bluetooth.gattparser.spec.Field;
@@ -54,6 +57,7 @@ public class GenericCharacteristicParser implements CharacteristicParser {
 
     private final Logger logger = LoggerFactory.getLogger(GenericCharacteristicParser.class);
     private final BluetoothGattSpecificationReader reader;
+    private final FormatterFactory prettyPrintFactory = new BasicFormatterFactory();
 
     GenericCharacteristicParser(BluetoothGattSpecificationReader reader) {
         this.reader = reader;
@@ -100,6 +104,25 @@ public class GenericCharacteristicParser implements CharacteristicParser {
                 offset += field.getFormat().getSize();
             }
         }
+
+        // add virtual field holder here?
+        try {
+            Formatter printer = prettyPrintFactory.prettyPrint(characteristic);
+            if (printer != null) {
+                String printed = printer.format(result.values());
+            
+                String fieldName = "PrettyPrint " + characteristic.getName();
+                Field field = new Field(fieldName, "utf8s");
+                FieldHolder holder = new FieldHolder(field, printed);
+
+                result.put(field.getName(), holder);
+            }
+        } catch (NullPointerException cfe) {
+            logger.error("No pretty printing defined: \"{}\".", characteristic.getName());
+        } catch (CharacteristicFormatException cfe) {
+            logger.error("No pretty printing defined: \"{}\".", characteristic.getName());
+        }
+
         return result;
     }
 
